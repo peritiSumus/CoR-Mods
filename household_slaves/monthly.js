@@ -1,0 +1,1 @@
+['/household_slaves/events/monthlyEvents']
