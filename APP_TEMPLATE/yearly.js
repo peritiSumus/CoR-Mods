@@ -1,1 +1,1 @@
-['/coemptio/config/entryYearly']
+['/MOD_PATH/config/entryYearly']

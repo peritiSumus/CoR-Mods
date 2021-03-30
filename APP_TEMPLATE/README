@@ -1,4 +1,12 @@
-To use this framework, make sure to update configuration in the files in /config to have the correct path for your mod. There's also a single line in helper.js that needs to have the MOD_PATH replaced. After that, anytime you add a new JS file with methods you want available universally, you just need to go and update the "modules" array in the entry methods. 
+To use this framework, make sure to update configuration:
+
+in the files in: /config (lines 10 & 11 in both files)
+in helper.js (line 39)
+in the monthly.js and yearly.js files (line 1)
+
+You can also search the project for: MOD_PATH and just replace each instance you find.
+
+After that, anytime you add a new JS file with methods you want available universally, you just need to go and update the "modules" array in the entry methods (line 11 in the two entry files in /config). 
 
 Once you've update the configuration to have your mod's path, you should run it empty in your game to make sure it is working. It will open the console and print out entry and then print out the current character object (both for monthly, and for yearly). 
 

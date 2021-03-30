@@ -1,1 +1,1 @@
-['/coemptio/config/entryMonthly']
+['/MOD_PATH/config/entryMonthly']
