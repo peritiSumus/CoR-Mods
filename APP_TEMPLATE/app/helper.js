@@ -1,0 +1,90 @@
+// ALL METHODS MUST HAVE FIRST PARAMETER TO HOLD INCOMING MODULES
+{
+    getCharacter: (E)=>{
+        return daapi.getCharacter({
+            characterId: daapi.getState().current.id
+        });
+    },
+    generateRandomIntegerBetween: (E, min, max) => {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+    randomStepValues: (E, steps)=>{
+        let value, defaultValue, past=0, r = E.generateRandomIntegerBetween(1, 100);
+        const valueFromItem = (item) => {
+            if (item.value)
+                return item.value;
+
+            if (item.min && item.max) 
+                return E.generateRandomIntegerBetween(item.min, item.max);
+
+            throw new Error("Invalid item");
+        };
+        steps.sort((a,b)=>{
+            return b.chance - a.chance;
+        }).forEach((item)=>{
+            if (value) return;
+            if (item.chance == 0) {
+                defaultValue = valueFromItem(item);
+            } else if (r <= (item.chance + past)) {
+                value=valueFromItem(item);
+            }
+            past += item.chance;
+        });
+        return value || defaultValue || -1;
+    },
+    pushInteractionModalQueue: (E, params) => {
+        // REPLACE ME
+        const moduleName = '/MOD_PATH/app/helper';
+        daapi.invokeMethod({
+            event: moduleName,
+            method: "genericPushInteractionModalQueue",
+            context: params
+        });
+    },
+    addSkillToCharacter: (E, {characterId, skill, value})=> {
+        const skillsValues = daapi.getCharacter({characterId}).skills;
+
+        skillsValues[skill] = Number.parseFloat(skillsValues[skill]) + parseFloat(value);
+
+        daapi.updateCharacter({
+            characterId: characterId,
+            character: {
+                skills: skillsValues
+            }
+        });
+    },
+    filterHouseCharacters: (E, ch=null, fn) => {
+        let returnCharacters = [];
+        ch = ch || E.getCharacter();
+        const retVal = fn(ch);
+        if (retVal) returnCharacters.push(retVal);
+
+        if (ch.isMale && ch.childrenIds && ch.childrenIds.length > 0) {
+            for (childId of ch.childrenIds) {
+                returnCharacters = returnCharacters.concat(E.filterHouseCharacters(daapi.getCharacter({
+                    characterId: childId
+                }), fn));
+            }
+        }
+        return returnCharacters;
+    },
+    randomFromArray: (E, a) => {
+        return a[Math.floor(Math.random() * a.length)];        
+    },
+    uuid: (E) => {
+        const b = crypto.getRandomValues(new Uint16Array(8));
+        const d = [].map.call(b, a => a.toString(16).padStart(4, '0')).join('');
+        const vr = (((b[5] >> 12) & 3) | 8).toString(16);
+        return `${d.substr(0, 8)}-${d.substr(8, 4)}-4${d.substr(13, 3)}-${vr}${d.substr(17, 3)}-${d.substr(20, 12)}`;
+    },
+    isFunction: (E, functionToCheck) => {
+        return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+    },
+    methods: {
+        genericPushInteractionModalQueue: (params) => {
+            daapi.pushInteractionModalQueue(params);
+        }        
+    }
+}

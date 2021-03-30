@@ -1,0 +1,1 @@
+['/coemptio/config/entryMonthly']
