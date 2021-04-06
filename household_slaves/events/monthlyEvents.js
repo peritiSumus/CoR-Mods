@@ -1009,7 +1009,7 @@
     },
 
     checkAndAct: () => {
-        daapi.openDevTools();
+        // daapi.openDevTools();
         console.log("START HOUSEHOLD SLAVES");
 
         const moduleName = '/household_slaves/events/monthlyEvents';
