@@ -1,0 +1,1 @@
+['/fraus/config/entryYearly']
