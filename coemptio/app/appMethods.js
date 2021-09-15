@@ -1,6 +1,6 @@
 {
     methods: {
-        genericProcessorHandler: (context)=>{
+        genericProcessorHandler: (context) => {
             context.E[context.method](context);
         }
     },
@@ -15,42 +15,49 @@
             data: stateData
         });
     },
-    addIconToCharacter: (E, c)=>{
-        daapi.addCharacterAction({
-            characterId: c.id,
-            key: c.id,
-            action: {
-                title: 'Search for a suitor',
-                icon: daapi.requireImage('/coemptio/assets/marriage.svg'),
-                isAvailable: true,
-                hideWhenBusy: false,
-                process: E.thisModuleProcessor('runCoemptioIcon', {
-                    characterId: c.id
-                })
-            }
-        });  
+    addIconToCharacter: (E, c) => {
+        console.log("add coemptio icon", c);
+        try {
+            const ret = daapi.addCharacterAction({
+                characterId: c.id,
+                key: 'coemptio' + c.id,
+                action: {
+                    title: 'Search for a suitor',
+                    icon: daapi.requireImage('/coemptio/assets/marriage.svg'),
+                    isAvailable: true,
+                    hideWhenBusy: false,
+                    process: E.thisModuleProcessor('runCoemptioIcon', {
+                        characterId: c.id
+                    })
+                }
+            });
+            console.log(ret);
+        } catch (e) {
+            console.log(e);
+        }
     },
     addBonusesToCandidate: (E, characterId, candidateId) => {
         const candidate = daapi.getCharacter({
-            characterId: candidateId
-        }), c = daapi.getCharacter({
-            characterId: characterId
-        });
+                characterId: candidateId
+            }),
+            c = daapi.getCharacter({
+                characterId: characterId
+            });
         const countSkills = (skills) => {
             return (parseFloat(skills.combat) + parseFloat(skills.eloquence) + parseFloat(skills.intelligence) + parseFloat(skills.stewardship)).toFixed(2)
         };
         // do trait roll
         const traitRoll = Math.random();
         let candidateTraits = candidate.traits;
-        if (traitRoll < (0.05*0.05*0.05)) {
+        if (traitRoll < (0.05 * 0.05 * 0.05)) {
             if (!candidateTraits.includes('strong')) candidateTraits.push('strong');
             if (!candidateTraits.includes('genius')) candidateTraits.push('genius');
             if (!candidateTraits.includes('attractive')) candidateTraits.push('attractive');
-        } else if (traitRoll < (0.05*0.05)) {
+        } else if (traitRoll < (0.05 * 0.05)) {
             let added = 0;
-            const skillMap = ['strong','genius','attractive'];
-            while ( (added < 2) && !(candidateTraits.includes('strong') && candidateTraits.includes('genius') && candidateTraits.includes('attractive')) ) {
-                let newSkill = skillMap[E.generateRandomIntegerBetween(0,2)];
+            const skillMap = ['strong', 'genius', 'attractive'];
+            while ((added < 2) && !(candidateTraits.includes('strong') && candidateTraits.includes('genius') && candidateTraits.includes('attractive'))) {
+                let newSkill = skillMap[E.generateRandomIntegerBetween(0, 2)];
                 if (!candidateTraits.includes(newSkill)) {
                     added += 1;
                     candidateTraits.push(newSkill);
@@ -58,17 +65,16 @@
             }
         } else if (traitRoll < 0.05) {
             let added = 0;
-            const skillMap = ['strong','genius','attractive'];
-            while ( (added < 1) && !(candidateTraits.includes('strong') && candidateTraits.includes('genius') && candidateTraits.includes('attractive')) ) {
-                let newSkill = skillMap[E.generateRandomIntegerBetween(0,2)];
+            const skillMap = ['strong', 'genius', 'attractive'];
+            while ((added < 1) && !(candidateTraits.includes('strong') && candidateTraits.includes('genius') && candidateTraits.includes('attractive'))) {
+                let newSkill = skillMap[E.generateRandomIntegerBetween(0, 2)];
                 if (!candidateTraits.includes(newSkill)) {
                     added += 1;
                     candidateTraits.push(newSkill);
                 }
             }
         }
-        const bonus = E.randomStepValues([
-            {
+        const bonus = E.randomStepValues([{
                 chance: 70,
                 min: 0,
                 max: 5
@@ -81,7 +87,7 @@
             {
                 chance: 10,
                 min: 12,
-                max: 18 
+                max: 18
             }
         ]);
 
@@ -93,7 +99,7 @@
                 { chance: 15, value: 2 },
                 { chance: 35, value: 3 }
             ]);
-            const skillValueRoll = E.generateRandomIntegerBetween(1,6);
+            const skillValueRoll = E.generateRandomIntegerBetween(1, 6);
             skills[skillMap[skillRoll]] += skillValueRoll;
             return skills;
         };
@@ -113,12 +119,12 @@
         });
     },
     generateMatch: (E, characterId) => {
-        let generatedCharacterId 
+        let generatedCharacterId
         while (!generatedCharacterId) {
-            generatedCharacterId = daapi.generateCharacter({ 
+            generatedCharacterId = daapi.generateCharacter({
                 characterFeatures: {
-                    isMale: false, 
-                    birthYear: daapi.getState().year - (E.generateRandomIntegerBetween(12,25))
+                    isMale: false,
+                    birthYear: daapi.getState().year - (E.generateRandomIntegerBetween(12, 25))
                 },
                 dynastyFeatures: {
                     heritage: (Math.random() > 0.5) ? 'roman_freedman' : 'roman_patrician'
@@ -141,13 +147,13 @@
         };
 
         const skillSum = countSkills(c.skills);
-        value *= (skillSum*1000);
+        value *= (skillSum * 1000);
 
         if (c.traits.includes('genius')) value *= 2.5;
         if (c.traits.includes('strong')) value *= 2.25;
         if (c.traits.includes('attractive')) value *= 2;
 
-        return Math.max(20000, E.randomWithMeanAndStdDev(value, value*0.1));
+        return Math.max(20000, E.randomWithMeanAndStdDev(value, value * 0.1));
     },
     generateMatches: (E, characterId, num) => {
         const results = [];
@@ -160,13 +166,13 @@
     addWife: (E, context) => {
         daapi.performMarriage({ characterId: context.characterId, spouseId: context.spouseId })
         const candidates = context.candidates;
-        candidates.forEach((c)=>{
+        candidates.forEach((c) => {
             if (c.id !== context.spouseId) {
                 daapi.kill({
                     characterId: c.id
                 });
             }
-        });        
+        });
     },
     getAdjectiveFromNumber: (E, num) => {
         const adjectiveMap = {
@@ -212,7 +218,7 @@
     },
     removeCandidates: (E, context) => {
         const candidates = context.candidates;
-        candidates.forEach((c)=>{
+        candidates.forEach((c) => {
             daapi.kill({
                 characterId: c.id
             });
@@ -220,15 +226,15 @@
     },
     seeMatchmakingOffers: (E, context) => {
         const characterId = context.characterId;
-        const potentialMatches = E.generateMatches(characterId, E.generateRandomIntegerBetween(3,6));
+        const potentialMatches = E.generateMatches(characterId, E.generateRandomIntegerBetween(3, 6));
         const countSkills = (skills) => {
             return (parseFloat(skills.combat) + parseFloat(skills.eloquence) + parseFloat(skills.intelligence) + parseFloat(skills.stewardship)).toFixed(2)
         };
         const options = [];
-        potentialMatches.forEach((c)=>{
+        potentialMatches.forEach((c) => {
             const skillSum = countSkills(c.skills);
             const fuzzFactor = 0.25;
-            const skillEstimate = parseFloat(E.randomWithMeanAndStdDev(skillSum, skillSum*fuzzFactor) / 4).toFixed(2);
+            const skillEstimate = parseFloat(E.randomWithMeanAndStdDev(skillSum, skillSum * fuzzFactor) / 4).toFixed(2);
             const age = parseFloat(daapi.calculateAge({ month: c.birthMonth, year: c.birthYear })).toFixed(2);
             const value = E.calculateValueOfCandidate(c);
             const description = E.generateDescription(c);
@@ -278,12 +284,12 @@
                 action: E.thisModuleProcessor('seeMatchmakingOffers', {
                     characterId: characterId
                 })
-            },{
+            }, {
                 text: 'Nevermind.',
                 tooltip: 'Nevermind.'
             }]
         });
-        modState.iconData.forEach((cId)=>{
+        modState.iconData.forEach((cId) => {
             daapi.deleteCharacterAction({
                 characterId: cId,
                 key: cId
@@ -292,21 +298,21 @@
         modState.iconData = [];
         E.saveModState(modState);
     },
-    thisModuleProcessor: (E, method, context)=> {
+    thisModuleProcessor: (E, method, context) => {
         return {
             event: '/coemptio/app/appMethods',
             method: 'genericProcessorHandler',
-            context: Object.assign({method: method, E: E}, context)
+            context: Object.assign({ method: method, E: E }, context)
         }
     },
-    updateCharacterActionIcons: (E)=> {
+    updateCharacterActionIcons: (E) => {
         const modState = E.getModState();
         modState.iconData = modState.iconData || [];
 
-        const marriagableMaleChildren = E.filterHouseCharacters(null, (c)=>{
+        const marriagableMaleChildren = E.filterHouseCharacters(null, (c) => {
             // alive?
             if (c.isDead) return false;
-            
+
             // check gender
             if (!c.isMale) return false;
 
@@ -316,20 +322,21 @@
 
             // check married?
             if (c.spouseId && !daapi.getCharacter({
-                characterId: c.spouseId
-            }).isDead ) return false;
+                    characterId: c.spouseId
+                }).isDead) return false;
 
             return c;
         });
-        modState.iconData.forEach((cId)=>{
+        modState.iconData.forEach((cId) => {
             daapi.deleteCharacterAction({
                 characterId: cId,
-                key: cId
+                key: 'coemptio' + cId
             });
         });
         modState.iconData = [];
 
-        marriagableMaleChildren.forEach((c)=>{
+        console.log(marriagableMaleChildren);
+        marriagableMaleChildren.forEach((c) => {
             E.addIconToCharacter(c);
             modState.iconData.push(c.id);
         });

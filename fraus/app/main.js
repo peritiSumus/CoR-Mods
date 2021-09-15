@@ -1,6 +1,8 @@
 // ALL METHODS MUST HAVE FIRST PARAMETER TO HOLD INCOMING MODULES
 {
     monthly: (M) => {
+        // daapi.openDevTools();
+
         console.log('inside monthly - fraus');
         const modState = M.getModState();
 

@@ -2,7 +2,7 @@
     canTriggerIfUnavailable: true,
     checkType: 'general',
     checkAndAct: (c) => {
-        daapi.openDevTools();
+        // daapi.openDevTools();
 
         const DEBUG = false;
 

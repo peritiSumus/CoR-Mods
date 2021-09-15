@@ -22,6 +22,18 @@
                     tooltip: 'Modify Influence',
                     action: E.thisModuleProcessor('modifyInfluence', {})
                 }, {
+                    text: 'Open Dev Console',
+                    tooltip: 'Open Dev Console',
+                    action: E.thisModuleProcessor('openDevConsole', {})
+                }, {
+                    text: 'End War',
+                    tooltip: 'End War',
+                    action: E.thisModuleProcessor('endWar', {})
+                }, {
+                    text: 'Start War',
+                    tooltip: 'Start War',
+                    action: E.thisModuleProcessor('startWar', {})
+                }, {
                     text: 'Nevermind.',
                     tooltip: 'Nevermind.'
                 }]
@@ -84,7 +96,7 @@
     addIconToCharacter: (E, c) => {
         daapi.addCharacterAction({
             characterId: c.id,
-            key: c.id,
+            key: 'fraus' + c.id,
             action: {
                 title: 'Cheats for this character',
                 icon: daapi.requireImage('/fraus/assets/repair.svg'),
@@ -174,8 +186,26 @@
                     characterId: characterId
                 })
             }, {
+                text: 'Display Character ID',
+                tooltip: 'Display Character ID',
+                action: E.thisModuleProcessor('displayCharacterId', {
+                    characterId: characterId
+                })
+            }, {
                 text: 'Nevermind.',
                 tooltip: 'Nevermind.'
+            }]
+        });
+    },
+    displayCharacterId: (E, context) => {
+        const cId = context.characterId;
+        daapi.pushInteractionModalQueue({
+            title: 'Character ID',
+            message: 'This is the requested character ID:',
+            inputs: [{
+                type: 'text',
+                title: 'Value',
+                value: cId
             }]
         });
     },
@@ -284,6 +314,15 @@
                 }
             }]
         });
+    },
+    openDevConsole: ({ input, index }) => {
+        daapi.openDevTools();
+    },
+    startWar: ({ input, index }) => {
+        daapi.startWar();
+    },
+    endWar: ({ input, index }) => {
+        daapi.endWar();
     },
     chooseTraitToRemove: (E, context) => {
         const cId = context.characterId;
@@ -415,7 +454,7 @@
         modState.iconData.forEach((cId) => {
             daapi.deleteCharacterAction({
                 characterId: cId,
-                key: cId
+                key: 'fraus' + cId
             });
         });
         modState.iconData = [];

@@ -61,23 +61,11 @@
         });
     },
     filterHouseCharacters: (E, ch = null, fn) => {
-        let returnCharacters = [];
-        ch = ch || E.getCharacter();
-        const retVal = fn(ch);
-        if (retVal) returnCharacters.push(retVal);
-
-        if (ch.isMale && ch.childrenIds && ch.childrenIds.length > 0) {
-            if (ch.spouseId) {
-                const spouse = daapi.getCharacter({ characterId: ch.spouseId });
-                if (fn(spouse)) returnCharacters.push(spouse);
-            }
-            for (childId of ch.childrenIds) {
-                returnCharacters = returnCharacters.concat(E.filterHouseCharacters(daapi.getCharacter({
-                    characterId: childId
-                }), fn));
-            }
-        }
-        return returnCharacters;
+        return daapi.getState().current.householdCharacterIds.map((cId) => {
+            return daapi.getCharacter({ characterId: cId });
+        }).filter((ch) => {
+            return fn(ch);
+        });
     },
     randomFromArray: (E, a) => {
         return a[Math.floor(Math.random() * a.length)];

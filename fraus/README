@@ -1,13 +1,1 @@
-To use this framework, make sure to update configuration:
-
-in the files in: /config (lines 10 & 11 in both files)
-in helper.js (line 39)
-in the monthly.js and yearly.js files (line 1)
-
-You can also search the project for: MOD_PATH and just replace each instance you find.
-
-After that, anytime you add a new JS file with methods you want available universally, you just need to go and update the "modules" array in the entry methods (line 11 in the two entry files in /config). 
-
-Once you've update the configuration to have your mod's path, you should run it empty in your game to make sure it is working. It will open the console and print out entry and then print out the current character object (both for monthly, and for yearly). 
-
-Every method you define in your modules should have the first parameter be for accepting and object with methods on it from all of the modules you indicated in your configuration. The framework will automatically set that first parameter when you call your methods, so although the method signature has to include a param to receive the modules object, you do not have to actually pass it in when you call your methods. 
+This mod will add a cheat icon to each character for modifying character specific stuff, and a global icon for dynasty/player level stuff. 

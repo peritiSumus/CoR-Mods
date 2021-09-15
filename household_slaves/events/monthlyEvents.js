@@ -21,14 +21,14 @@
     },
     _slaveToString: (slave) => {
         const lines = [`Name: ${slave.name}`, `Age: ${slave.age}`];
-        for (const key in slave.modifiers ) {
+        for (const key in slave.modifiers) {
             const modifier = slave.modifiers[key]
             lines.push(`${key}: ${modifier.factor}`);
         }
         for (const skill in slave.skills) {
             const value = slave.skills[skill];
             lines.push(`${skill}: ${value}`);
-        }                
+        }
         return lines.join(", ");
     },
     _generateRandomSlave: () => {
@@ -48,28 +48,29 @@
         newSlave = E.addRandomInitialBonuses(newSlave);
         return newSlave;
     },
-    _randomStepValues: (steps)=>{
+    _randomStepValues: (steps) => {
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
 
-        let value, defaultValue, past=0, r = E.generateRandomIntegerBetween(1, 100);
+        let value, defaultValue, past = 0,
+            r = E.generateRandomIntegerBetween(1, 100);
         const valueFromItem = (item) => {
             if (item.value)
                 return item.value;
 
-            if (item.min && item.max) 
+            if (item.min && item.max)
                 return E.generateRandomIntegerBetween(item.min, item.max);
 
             throw new Error("Invalid item");
         };
-        steps.sort((a,b)=>{
+        steps.sort((a, b) => {
             return b.chance - a.chance;
-        }).forEach((item)=>{
+        }).forEach((item) => {
             if (value) return;
             if (item.chance == 0) {
                 defaultValue = valueFromItem(item);
             } else if (r <= (item.chance + past)) {
-                value=valueFromItem(item);
+                value = valueFromItem(item);
             }
             past += item.chance;
         });
@@ -87,21 +88,21 @@
             case 'educator':
                 break;
             case 'doctor':
-                factor = E.generateRandomIntegerBetween(2, Math.max(2,E.randomStepValues([
-                    {chance: 0, value: 2},
-                    {chance: 60, value: 2},
-                    {chance: 30, value: 3},
-                    {chance: 10, value: 5}
+                factor = E.generateRandomIntegerBetween(2, Math.max(2, E.randomStepValues([
+                    { chance: 0, value: 2 },
+                    { chance: 60, value: 2 },
+                    { chance: 30, value: 3 },
+                    { chance: 10, value: 5 }
                 ])));
                 slave.modifiers.household_fertility = {
                     factor: factor * Math.max(1, (slave.level / 5)),
                     id: E.uuid()
                 };
-                factor = E.generateRandomIntegerBetween(2, Math.max(2,E.randomStepValues([
-                    {chance: 0, value: 2},
-                    {chance: 60, value: 2},
-                    {chance: 30, value: 3},
-                    {chance: 10, value: 5}
+                factor = E.generateRandomIntegerBetween(2, Math.max(2, E.randomStepValues([
+                    { chance: 0, value: 2 },
+                    { chance: 60, value: 2 },
+                    { chance: 30, value: 3 },
+                    { chance: 10, value: 5 }
                 ])));
                 slave.modifiers.household_health = {
                     factor: factor * Math.max(1, (slave.level / 5)),
@@ -116,18 +117,18 @@
                     slave.modifiers.revenue = {
                         factor: factor.toFixed(2),
                         id: E.uuid()
-                    };    
+                    };
                 } else {
-                    factor = E.generateRandomIntegerBetween(1,3) * (Math.max(1, slave.level / 5));
+                    factor = E.generateRandomIntegerBetween(1, 3) * (Math.max(1, slave.level / 5));
                     slave.skills.stewardship = factor.toFixed(2);
                 }
                 break;
             case 'warrior':
-                factor = E.generateRandomIntegerBetween(2, Math.max(2,E.randomStepValues([
-                    {chance: 0, value: 1},
-                    {chance: 60, value: 2},
-                    {chance: 30, value: 3},
-                    {chance: 10, value: 5}
+                factor = E.generateRandomIntegerBetween(2, Math.max(2, E.randomStepValues([
+                    { chance: 0, value: 1 },
+                    { chance: 60, value: 2 },
+                    { chance: 30, value: 3 },
+                    { chance: 10, value: 5 }
                 ])));
                 factor = factor * Math.max(1, (slave.level / 5));
                 factor = Math.max(1, factor / 2);
@@ -138,24 +139,24 @@
                 break;
         }
         return slave;
-    },        
+    },
     _getAppData: () => {
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
 
-        return (daapi.getGlobalFlag({flag: E.dataFlagName}) || []);
+        return (daapi.getGlobalFlag({ flag: E.dataFlagName }) || []);
     },
     _saveAppData: (data = []) => {
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
 
-        return daapi.setGlobalFlag({flag: E.dataFlagName, data: data});
+        return daapi.setGlobalFlag({ flag: E.dataFlagName, data: data });
     },
     _set: (key, value) => {
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
 
-        if (key.slice(0,1) !== '_') key = ("_" + key);
+        if (key.slice(0, 1) !== '_') key = ("_" + key);
 
         console.log("writing", key, value);
         daapi.modData.events[moduleName][key] = value;
@@ -164,7 +165,7 @@
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
         const slaves = E.getAppData();
-        for (let i=0; i<slaves.length; i++) {
+        for (let i = 0; i < slaves.length; i++) {
             if (slaves[i].type.toLowerCase() == type.toLowerCase())
                 return slaves[i];
         }
@@ -181,12 +182,12 @@
     _removeSlaveByKey: (key) => {
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
-        
-        E.saveAppData(E.getAppData().filter((slave)=>{
-            if (slave.key == key) {
-                daapi.deleteCharacterAction({characterId: slave.characterId, key: slave.key});
 
-                for (const key in slave.modifiers ) {
+        E.saveAppData(E.getAppData().filter((slave) => {
+            if (slave.key == key) {
+                daapi.deleteCharacterAction({ characterId: slave.characterId, key: slave.key });
+
+                for (const key in slave.modifiers) {
                     const modifier = slave.modifiers[key]
                     daapi.removeModifier({
                         key: key,
@@ -208,9 +209,9 @@
         }));
         daapi.updateCharacter({});
     },
-    _addSkillToCharacter: ({characterId, skill, value})=> {
+    _addSkillToCharacter: ({ characterId, skill, value }) => {
         console.log('add skill', characterId, skill, value);
-        const skillsValues = daapi.getCharacter({characterId}).skills;
+        const skillsValues = daapi.getCharacter({ characterId }).skills;
 
         console.log('current skills', skillsValues);
         skillsValues[skill] = Number.parseFloat(skillsValues[skill]) + parseFloat(value);
@@ -223,7 +224,7 @@
             }
         });
     },
-    _addSlave: (slave)=>{
+    _addSlave: (slave) => {
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
         const characterId = daapi.getState().current.id;
@@ -238,8 +239,8 @@
                     action: {
                         event: moduleName,
                         method: "doSwapSlave",
-                        context: {previousSlave: previousSlave, newSlave: slave}
-                    }                    
+                        context: { previousSlave: previousSlave, newSlave: slave }
+                    }
                 }, {
                     text: `No, ${previousSlave.name} has served me well. They may stay.`,
                 }]
@@ -248,12 +249,12 @@
         }
         E.saveAppData(E.getAppData().concat(slave));
 
-        for (const key in slave.modifiers ) {
+        for (const key in slave.modifiers) {
             const modifier = slave.modifiers[key]
             daapi.addModifier({
                 key: key,
                 id: modifier.id,
-                durationInMonths: 100*12,
+                durationInMonths: 100 * 12,
                 factor: modifier.factor
             });
         }
@@ -282,12 +283,12 @@
         });
         daapi.updateCharacter({});
     },
-    _filterHouseCharacters: (ch=null, fn) => {
+    _filterHouseCharacters: (ch = null, fn) => {
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
 
         let returnCharacters = [];
-        ch = ch || daapi.getCharacter({characterId: daapi.getState().current.id});
+        ch = ch || daapi.getCharacter({ characterId: daapi.getState().current.id });
         const retVal = fn(ch);
         if (retVal) returnCharacters.push(retVal);
 
@@ -304,12 +305,12 @@
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
 
-        const candidates = E.filterHouseCharacters(null, (c)=>{
+        const candidates = E.filterHouseCharacters(null, (c) => {
             let age = daapi.calculateAge({ month: c.birthMonth, year: c.birthYear });
             if ((age < 25) && (age > 3) && !c.isDead &&
                 !c.flagIsBusy &&
                 !c.flagIsAway && !(!c.isMale && c.spouseId)) return c;
-         
+
             return null;
         });
         if (candidates.length && candidates.length > 0) {
@@ -317,10 +318,10 @@
         }
         return null;
     },
-    _getTreatableTraits: (c)=>{
+    _getTreatableTraits: (c) => {
         let traits = [];
         const addMatchingTrait = (ch, traits, trait) => {
-            if (ch.traits.includes(trait)) 
+            if (ch.traits.includes(trait))
                 traits.push(trait);
             return traits;
         };
@@ -343,10 +344,10 @@
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
 
         let trait;
-        const candidates = E.filterHouseCharacters(null, (c)=>{
+        const candidates = E.filterHouseCharacters(null, (c) => {
             if (c.isDead ||
                 c.flagIsBusy ||
-                c.flagIsAway || 
+                c.flagIsAway ||
                 (!c.isMale && c.spouseId)
             ) {
                 return null
@@ -360,10 +361,10 @@
         }
         return null;
     },
-    _getEntertainableTraits: (c)=>{
+    _getEntertainableTraits: (c) => {
         let traits = [];
         const addMatchingTrait = (ch, traits, trait) => {
-            if (ch.traits.includes(trait)) 
+            if (ch.traits.includes(trait))
                 traits.push(trait);
             return traits;
         };
@@ -386,10 +387,10 @@
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
 
         let trait;
-        const candidates = E.filterHouseCharacters(null, (c)=>{
+        const candidates = E.filterHouseCharacters(null, (c) => {
             if (c.isDead ||
                 c.flagIsBusy ||
-                c.flagIsAway || 
+                c.flagIsAway ||
                 (!c.isMale && c.spouseId)
             ) {
                 return null
@@ -404,14 +405,14 @@
         return null;
     },
     _randomFromArray: (a) => {
-        return a[Math.floor(Math.random() * a.length)];        
+        return a[Math.floor(Math.random() * a.length)];
     },
     _slaveLevelUp: (slave) => {
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
         E.removeSlaveByKey(slave.key);
-        
-        slave.level == 10 ? 10 : slave.level+1;
+
+        slave.level == 10 ? 10 : slave.level + 1;
         // we gigged the level, do they get a stat increase elsewhere?
         // maybe add a random bonus independent of the slave type?
 
@@ -430,7 +431,7 @@
                 let chanceToLevelSlave = 0;
                 const roll = Math.random();
                 // console.log("ROLL: ", roll, (odds[slave.level-1] || 0.07));
-                if (roll < (odds[slave.level-1] || 0.07)) {
+                if (roll < (odds[slave.level - 1] || 0.07)) {
                     // lucky event
                     chanceToLevelSlave = 0.25;
                     switch (slave.type) {
@@ -448,7 +449,7 @@
                                         // most of the time, add to base stats
                                         const max = Math.max(1, slave.level > 2 ? 2 : 1, slave.level > 7 ? 3 : 1);
                                         const addToTrait = E.generateRandomIntegerBetween(1, max);
-                                        const skill = (Math.random() > 0.5) ? 'stewardship' : 'eloquence'; 
+                                        const skill = (Math.random() > 0.5) ? 'stewardship' : 'eloquence';
 
                                         E.pushInteractionModalQueue({
                                             title: `Your Slave, ${slave.name} Reports Results`,
@@ -466,10 +467,11 @@
                                         // rarely, we add a trait
                                         chanceToLevelSlave = 0.4;
 
-                                        const possibleTraits = [], reversers = {
-                                            gregarious: 'shy',
-                                            honorable: 'sly',
-                                        };
+                                        const possibleTraits = [],
+                                            reversers = {
+                                                gregarious: 'shy',
+                                                honorable: 'sly',
+                                            };
                                         if (!child.traits.includes('erudite')) possibleTraits.push('erudite');
                                         if (!child.traits.includes('gregarious')) possibleTraits.push('gregarious');
                                         if (!child.traits.includes('honorable')) possibleTraits.push('honorable');
@@ -499,8 +501,8 @@
                                             });
                                         } else {
                                             const addToTrait = 3;
-                                            const skill = (Math.random() > 0.5) ? 'stewardship' : 'eloquence'; 
-        
+                                            const skill = (Math.random() > 0.5) ? 'stewardship' : 'eloquence';
+
                                             E.pushInteractionModalQueue({
                                                 title: `Your Slave, ${slave.name} Reports Results`,
                                                 message: `Master, I've educated your kin, ${child.praenomen}, in the skill of ${skill}. Their improvement has been amazing!`,
@@ -512,8 +514,8 @@
                                                 characterId: child.id,
                                                 skill: skill,
                                                 value: addToTrait
-                                            });    
-                                        }                                 
+                                            });
+                                        }
                                     }
                                 }
                             }
@@ -523,47 +525,46 @@
                             if (secondRoll > 0.9) {
                                 // 10% chance of property deal
                                 const properties = [{
-                                        type: "farmland",
-                                        max: 5,
-                                        normalCost: 250
-                                    }, {
-                                        type: "vinyard",
-                                        max: 5,
-                                        normalCost: 360
-                                    },{
-                                        type: "orchard",
-                                        max: 5,
-                                        normalCost: 420
-                                    },{
-                                        type: "primeFarmland",
-                                        max: 3,
-                                        normalCost: 2700
-                                    },{
-                                        type: "primeVinyard",
-                                        max: 3,
-                                        normalCost: 3300
-                                    },{
-                                        type: "primeOrchard",
-                                        max: 3,
-                                        normalCost: 3900
-                                    },{
-                                        type: "latifundiumFood",
-                                        max: 1,
-                                        normalCost: 11000
-                                    },{
-                                        type: "latifundiumAnimal",
-                                        max: 1,
-                                        normalCost: 14000
-                                    },{
-                                        type: "latifundiumFish",
-                                        max: 1,
-                                        normalCost: 17000
-                                    },{
-                                        type: "latifundiumOil",
-                                        max: 1,
-                                        normalCost: 21000
-                                    }
-                                ];
+                                    type: "farmland",
+                                    max: 5,
+                                    normalCost: 250
+                                }, {
+                                    type: "vinyard",
+                                    max: 5,
+                                    normalCost: 360
+                                }, {
+                                    type: "orchard",
+                                    max: 5,
+                                    normalCost: 420
+                                }, {
+                                    type: "primeFarmland",
+                                    max: 3,
+                                    normalCost: 2700
+                                }, {
+                                    type: "primeVinyard",
+                                    max: 3,
+                                    normalCost: 3300
+                                }, {
+                                    type: "primeOrchard",
+                                    max: 3,
+                                    normalCost: 3900
+                                }, {
+                                    type: "latifundiumFood",
+                                    max: 1,
+                                    normalCost: 11000
+                                }, {
+                                    type: "latifundiumAnimal",
+                                    max: 1,
+                                    normalCost: 14000
+                                }, {
+                                    type: "latifundiumFish",
+                                    max: 1,
+                                    normalCost: 17000
+                                }, {
+                                    type: "latifundiumOil",
+                                    max: 1,
+                                    normalCost: 21000
+                                }];
                                 const propertyDefinition = E.randomFromArray(properties);
                                 const propertyCount = E.generateRandomIntegerBetween(1, propertyDefinition.max);
                                 const normalCost = propertyCount * propertyDefinition.normalCost;
@@ -579,7 +580,7 @@
                                             cash: (offerPrice / scale) * -1,
                                             property: property
                                         }
-                                    },{
+                                    }, {
                                         text: `Excellent find, ${slave.name}, but I must pass on this deal.`
                                     }]
                                 });
@@ -603,7 +604,7 @@
                                     // most of the time, add to base stats
                                     const max = Math.max(1, slave.level > 2 ? 2 : 1, slave.level > 7 ? 3 : 1);
                                     const addToTrait = E.generateRandomIntegerBetween(1, max);
-                                    const skill = 'stewardship'; 
+                                    const skill = 'stewardship';
 
                                     E.pushInteractionModalQueue({
                                         title: `Your Slave, ${slave.name} Reports Results`,
@@ -617,7 +618,7 @@
                                         skill: skill,
                                         value: addToTrait
                                     });
-                                }                            
+                                }
                             }
                             break;
                         default:
@@ -632,7 +633,7 @@
                 const doctorOdds = [0.055, 0.06, 0.065, 0.07, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2];
                 const treatableCharacter = E.getRandomTreatableKin();
                 const treatmentRoll = Math.random();
-                if ( treatableCharacter && (treatmentRoll < (doctorOdds[slave.level-1] || 0.2)) ) {
+                if (treatableCharacter && (treatmentRoll < (doctorOdds[slave.level - 1] || 0.2))) {
                     const replaceTrait = {
                         "highlyStress": "stress",
                         "cripplingDepression": "depression",
@@ -651,7 +652,7 @@
                     if (replaceTrait[treatmentTrait]) {
                         daapi.addTrait({
                             characterId: treatableCharacter.id,
-                            trait: replaceTrait[treatmentTrait]    
+                            trait: replaceTrait[treatmentTrait]
                         });
                     }
                     E.pushInteractionModalQueue({
@@ -668,7 +669,7 @@
                     if (c) {
                         const max = Math.max(1, s.level > 2 ? 2 : 1, s.level > 7 ? 3 : 1);
                         const addToTrait = E.generateRandomIntegerBetween(1, max);
-                        const skill = 'eloquence'; 
+                        const skill = 'eloquence';
 
                         E.pushInteractionModalQueue({
                             title: `Your Slave, ${s.name} Reports Results`,
@@ -688,15 +689,15 @@
                 if (Math.random() < 0.05) {
                     // add trait
                     if (Math.random() < 0.3) {
-                        const candidates = E.filterHouseCharacters(null, (c)=>{
+                        const candidates = E.filterHouseCharacters(null, (c) => {
                             if (c.isDead ||
                                 c.flagIsBusy ||
-                                c.flagIsAway || 
+                                c.flagIsAway ||
                                 (!c.isMale && c.spouseId)
                             ) {
                                 return null
                             }
-                
+
                             return c.traits.includes('gregarious') ? null : c;
                         });
                         if (candidates.length && candidates.length > 0) {
@@ -726,7 +727,7 @@
                 const entertainerOdds = [0.15, 0.20, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8];
                 const treatableCharacter = E.getRandomEntertainableKin();
                 const treatmentRoll = Math.random();
-                if ( treatableCharacter && (treatmentRoll < (entertainerOdds[slave.level-1] || 0.2)) ) {
+                if (treatableCharacter && (treatmentRoll < (entertainerOdds[slave.level - 1] || 0.2))) {
                     const replaceTrait = {
                         "highlyStress": "stress",
                         "cripplingDepression": "depression",
@@ -744,7 +745,7 @@
                     if (replaceTrait[treatmentTrait]) {
                         daapi.addTrait({
                             characterId: treatableCharacter.id,
-                            trait: replaceTrait[treatmentTrait]    
+                            trait: replaceTrait[treatmentTrait]
                         });
                     }
                     E.pushInteractionModalQueue({
@@ -759,20 +760,20 @@
                 // first, good odds they keep someone in shape
                 const doctorOdds = [0.3, 0.4, 0.5, 0.5, 0.75, 0.75, 1, 1, 1, 1];
 
-                const candidates = E.filterHouseCharacters(null, (c)=>{
+                const candidates = E.filterHouseCharacters(null, (c) => {
                     if (c.isDead ||
                         c.flagIsBusy ||
-                        c.flagIsAway || 
+                        c.flagIsAway ||
                         (!c.isMale && c.spouseId)
                     ) {
                         return null
-                    }        
+                    }
                     return c.traits.includes('fat') || c.traits.includes('morbidlyFat') ? c : null;
                 });
                 if (candidates.length && candidates.length > 0) {
                     const luckyKin = E.randomFromArray(candidates);
                     const treatmentRoll = Math.random();
-                    if ( treatmentRoll < (doctorOdds[slave.level-1] || 1) ) {
+                    if (treatmentRoll < (doctorOdds[slave.level - 1] || 1)) {
                         daapi.removeTrait({
                             characterId: treatableCharacter.id,
                             trait: 'fat'
@@ -797,7 +798,7 @@
                     if (c) {
                         const max = Math.max(1, s.level > 2 ? 2 : 1, s.level > 7 ? 3 : 1);
                         const addToTrait = E.generateRandomIntegerBetween(1, max);
-                        const skill = 'combat'; 
+                        const skill = 'combat';
 
                         E.pushInteractionModalQueue({
                             title: `Your Slave, ${s.name} Reports Results`,
@@ -814,13 +815,13 @@
                     }
                 };
                 // rare events
-                if (Math.random() < Math.max(0.05, 0.01*slave.level)) {
+                if (Math.random() < Math.max(0.05, 0.01 * slave.level)) {
                     // add trait
                     if (Math.random() < 0.3) {
                         const candidate = E.getRandomChildAvailableForEducation();
                         if (candidate) {
-                            const getRandomTrait = ()=>{
-                                return E.randomFromArray(['horseRider','charioteer','gladiator','wrestler','strong','taurian','marksMan','authoritative', 'competitive']);
+                            const getRandomTrait = () => {
+                                return E.randomFromArray(['horseRider', 'charioteer', 'gladiator', 'wrestler', 'strong', 'taurian', 'marksMan', 'authoritative', 'competitive']);
                             };
                             const traitStrings = {
                                 horseRider: "a horseman",
@@ -830,12 +831,13 @@
                                 strong: "strong",
                                 taurian: "a taurian",
                                 marksMan: "a marksman",
-                                authoritative: "authoratative", 
-                                competitive: "competitive"                                
+                                authoritative: "authoratative",
+                                competitive: "competitive"
                             };
-                            let newTrait = getRandomTrait(), defense=0;
+                            let newTrait = getRandomTrait(),
+                                defense = 0;
                             while (candidate.traits.includes(newTrait) && defense < 500) {
-                                defense+=1;
+                                defense += 1;
                                 newTrait = getRandomTrait();
                             }
                             // add gregarious
@@ -857,7 +859,7 @@
                         // add to combat
                         giveSomeCombat(slave);
                     }
-                }                
+                }
             }
         }
     },
@@ -865,12 +867,12 @@
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
         const slaves = E.getAppData();
-        const updatedSlaves = slaves.filter((s)=>{
+        const updatedSlaves = slaves.filter((s) => {
             let deathChance;
             if (s.age >= 50) {
-                deathChance = (1/15 * (s.age / 65));
+                deathChance = (1 / 25 * (s.age / 65));
             } else {
-                deathChance = (1/40 * (s.age / 50));
+                deathChance = (1 / 80 * (s.age / 50));
             }
 
             if (Math.random() < deathChance) {
@@ -885,8 +887,8 @@
                 return false;
             }
             return true;
-        }).map((s)=>{
-            s.age += (1/12);
+        }).map((s) => {
+            s.age += (1 / 12);
             if (Math.random() < .02) {
                 s = E.slaveLevelUp(s);
             }
@@ -907,18 +909,20 @@
 
         const slavesOnSale = [];
         // every once in a while, a merchant with skilled slaves will appear
-        if (Math.random() < 0.05) {
-            for (let i=-2; i<E.generateRandomIntegerBetween(1,3); i++) {
+        const roll = Math.random();
+        console.log("rolling for slave market: " + roll);
+        if (roll < 0.05) {
+            for (let i = -2; i < E.generateRandomIntegerBetween(1, 3); i++) {
                 slavesOnSale.push(E.generateRandomSlave());
             }
 
-            const assessmentAccuracyRating = Math.max(1,((character.skills.intelligence / 15) + (Math.random()) + (E.getSlaveByType("manager") ? 1.5 : 0.5))/3);
+            const assessmentAccuracyRating = Math.max(1, ((character.skills.intelligence / 15) + (Math.random()) + (E.getSlaveByType("manager") ? 1.5 : 0.5)) / 3);
             console.log(assessmentAccuracyRating);
             const slaveOptions = [];
             for (const slave of slavesOnSale) {
                 const accuracyFactor = slave.level - (slave.level * assessmentAccuracyRating);
-                const perceivedLevel = Math.round(slave.level + ((Math.random() > 0.5 ? -1:1) * accuracyFactor));
-                const costOfSlave = (E.generateRandomIntegerBetween(750,1250) * slave.level) * (E.generateRandomIntegerBetween(75,125)/100) * 2;
+                const perceivedLevel = Math.round(slave.level + ((Math.random() > 0.5 ? -1 : 1) * accuracyFactor));
+                const costOfSlave = (E.generateRandomIntegerBetween(750, 1250) * slave.level) * (E.generateRandomIntegerBetween(75, 125) / 100) * 2;
 
                 console.log("COST: ", costOfSlave, slave);
                 slaveOptions.push({
@@ -943,7 +947,7 @@
             });
         }
     },
-    _refreshCommandIcons: ()=>{
+    _refreshCommandIcons: () => {
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName);
         const character = daapi.getCharacter({
@@ -954,7 +958,7 @@
         if (slaves && slaves.length > 0) {
             if (slaves[0].characterId !== character.id) {
                 // the owner of these slaves has died, transfer ownership
-                const updatedSlaves = slaves.map((s)=>{
+                const updatedSlaves = slaves.map((s) => {
                     E.removeSlaveByKey(s.key);
                     s.characterId = character.id;
                     E.addSlave(s);
@@ -974,7 +978,7 @@
         return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
     },
     _debug: false,
-    setupMethod: (path, debug=false) => {
+    setupMethod: (path, debug = false) => {
         const methodsObject = daapi.modData.events[path];
         const returnObject = {};
 
@@ -983,14 +987,14 @@
         for (prop in methodsObject) {
             if (prop.match(/^_[a-zA-Z0-9]{1}.+?$/)) {
                 if (daapi.modData.events['/household_slaves/events/monthlyEvents']._isFunction(methodsObject[prop])) {
-                    returnObject[prop.slice(1)] = (function (m, p) {
-                        return function (...args) {
+                    returnObject[prop.slice(1)] = (function(m, p) {
+                        return function(...args) {
                             try {
-                                if (debug){
+                                if (debug) {
                                     console.log("CALLING: " + p, ...args);
                                 }
                                 const retVal = m[p](...args);
-                                if (debug && retVal){
+                                if (debug && retVal) {
                                     console.log("RETURNING: " + p, retVal);
                                 }
                                 return retVal;
@@ -1001,7 +1005,7 @@
                     })(methodsObject, prop);
                 } else {
                     returnObject[prop.slice(1)] = methodsObject[prop];
-                } 
+                }
             }
         }
 
@@ -1014,7 +1018,7 @@
 
         const moduleName = '/household_slaves/events/monthlyEvents';
         const E = daapi.modData.events[moduleName].setupMethod(moduleName, false);
-        
+
         E.refreshCommandIcons();
         E.checkForSlaveBonuses();
         E.progressSlaves();
@@ -1028,7 +1032,7 @@
         genericPushInteractionModalQueue: (params) => {
             daapi.pushInteractionModalQueue(params);
         },
-        doSwapSlave: ({previousSlave, newSlave}) => {
+        doSwapSlave: ({ previousSlave, newSlave }) => {
             const moduleName = '/household_slaves/events/monthlyEvents';
             const E = daapi.modData.events[moduleName].setupMethod(moduleName);
 
