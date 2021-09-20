@@ -1,6 +1,6 @@
 // ALL METHODS MUST HAVE FIRST PARAMETER TO HOLD INCOMING MODULES
 {
-    getCharacter: (E)=>{
+    getCharacter: (E) => {
         return daapi.getCharacter({
             characterId: daapi.getState().current.id
         });
@@ -13,26 +13,27 @@
     randomWithMeanAndStdDev: (E, m, s) => {
         return parseFloat(m + 2.0 * s * (Math.random() + Math.random() + Math.random() - 1.5)).toFixed(2);
     },
-    randomStepValues: (E, steps)=>{
-        let value, defaultValue, past=0, r = E.generateRandomIntegerBetween(1, 100);
+    randomStepValues: (E, steps) => {
+        let value, defaultValue, past = 0,
+            r = E.generateRandomIntegerBetween(1, 100);
         const valueFromItem = (item) => {
             console.log("ITEM: ", item);
-            if (item.value || item.value===0)
+            if (item.value || item.value === 0)
                 return item.value;
 
-            if ((item.min || item.min===0) && item.max) 
+            if ((item.min || item.min === 0) && item.max)
                 return E.generateRandomIntegerBetween(item.min, item.max);
 
             throw new Error("Invalid item");
         };
-        steps.sort((a,b)=>{
+        steps.sort((a, b) => {
             return b.chance - a.chance;
-        }).forEach((item)=>{
+        }).forEach((item) => {
             if (value) return;
             if (item.chance == 0) {
                 defaultValue = valueFromItem(item);
             } else if (r <= (item.chance + past)) {
-                value=valueFromItem(item);
+                value = valueFromItem(item);
             }
             past += item.chance;
         });
@@ -47,8 +48,8 @@
             context: params
         });
     },
-    addSkillToCharacter: (E, {characterId, skill, value})=> {
-        const skillsValues = daapi.getCharacter({characterId}).skills;
+    addSkillToCharacter: (E, { characterId, skill, value }) => {
+        const skillsValues = daapi.getCharacter({ characterId }).skills;
 
         skillsValues[skill] = Number.parseFloat(skillsValues[skill]) + parseFloat(value);
 
@@ -59,23 +60,15 @@
             }
         });
     },
-    filterHouseCharacters: (E, ch=null, fn) => {
-        let returnCharacters = [];
-        ch = ch || E.getCharacter();
-        const retVal = fn(ch);
-        if (retVal) returnCharacters.push(retVal);
-
-        if (ch.isMale && ch.childrenIds && ch.childrenIds.length > 0) {
-            for (childId of ch.childrenIds) {
-                returnCharacters = returnCharacters.concat(E.filterHouseCharacters(daapi.getCharacter({
-                    characterId: childId
-                }), fn));
-            }
-        }
-        return returnCharacters;
+    filterHouseCharacters: (E, ch = null, fn) => {
+        return daapi.getState().current.householdCharacterIds.map((cId) => {
+            return daapi.getCharacter({ characterId: cId });
+        }).filter((ch) => {
+            return fn(ch);
+        });
     },
     randomFromArray: (E, a) => {
-        return a[Math.floor(Math.random() * a.length)];        
+        return a[Math.floor(Math.random() * a.length)];
     },
     uuid: (E) => {
         const b = crypto.getRandomValues(new Uint16Array(8));
@@ -89,6 +82,6 @@
     methods: {
         genericPushInteractionModalQueue: (params) => {
             daapi.pushInteractionModalQueue(params);
-        }        
+        }
     }
 }

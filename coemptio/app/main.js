@@ -10,6 +10,7 @@
 
         }
 
+        console.log("COEMPTIO: update icons");
         M.updateCharacterActionIcons();
     },
     yearly: (M) => {

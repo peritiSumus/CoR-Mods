@@ -131,7 +131,9 @@
                 }
             });
             const candidate = daapi.getCharacter({ characterId: generatedCharacterId });
-            if (candidate.traits.includes('weak') || candidate.traits.includes('deformed') || candidate.traits.includes('dimwit') || candidate.traits.includes('mangled') || candidate.traits.includes('deaf') || candidate.traits.includes('blind') || candidate.traits.includes('mute') || candidate.traits.includes('stutter')) {
+
+            // re-roll if we get a major bad trait. Should I just remove them? 
+            if (candidate.traits.includes('mute') || candidate.traits.includes('deaf') || candidate.traits.includes('blind')) {
                 generatedCharacterId = undefined;
             }
         }
@@ -195,6 +197,7 @@
     generateDescription: (E, c) => {
         let description;
         const standoutTraits = [];
+        const badTraits = [];
 
         if (c.skills.intelligence >= 15)
             standoutTraits.push(E.getAdjectiveFromNumber(c.skills.intelligence) + ' intelligent');
@@ -210,6 +213,21 @@
             standoutTraits.push(E.getAdjectiveFromNumber(25) + ' strong');
         if (c.traits.includes('attractive'))
             standoutTraits.push(E.getAdjectiveFromNumber(20) + ' beautiful');
+
+        if (c.traits.includes('ugly'))
+            standoutTraits.push('ugly');
+        if (c.traits.includes('dwarf'))
+            standoutTraits.push('a dwarf');
+        if (c.traits.includes('giant'))
+            standoutTraits.push('a giant');
+        if (c.traits.includes('dimwit'))
+            standoutTraits.push('dimwitted');
+        if (c.traits.includes('deformed'))
+            standoutTraits.push('deformed');
+        if (c.traits.includes('stutter'))
+            standoutTraits.push('stutters');
+        if (c.traits.includes('alcoholic'))
+            standoutTraits.push('an alcoholic');
 
         if (standoutTraits.length >= 2) {
             let lastItem = standoutTraits.pop();
@@ -296,7 +314,7 @@
         modState.iconData.forEach((cId) => {
             daapi.deleteCharacterAction({
                 characterId: cId,
-                key: cId
+                key: "coemptio" + cId
             });
         });
         modState.iconData = [];
@@ -332,6 +350,7 @@
             return c;
         });
         modState.iconData.forEach((cId) => {
+            console.log("deleting icon", cId);
             daapi.deleteCharacterAction({
                 characterId: cId,
                 key: 'coemptio' + cId
@@ -339,10 +358,10 @@
         });
         modState.iconData = [];
 
-        console.log(marriagableMaleChildren);
+        console.log("marriagableMaleChildren", marriagableMaleChildren);
         marriagableMaleChildren.forEach((c) => {
-            E.addIconToCharacter(c);
             modState.iconData.push(c.id);
+            E.addIconToCharacter(c);
         });
         E.saveModState(modState);
     }
