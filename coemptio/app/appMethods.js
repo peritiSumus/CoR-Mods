@@ -130,6 +130,10 @@
                     heritage: (Math.random() > 0.5) ? 'roman_freedman' : 'roman_patrician'
                 }
             });
+            const candidate = daapi.getCharacter({ characterId: generatedCharacterId });
+            if (candidate.traits.includes('weak') || candidate.traits.includes('deformed') || candidate.traits.includes('dimwit') || candidate.traits.includes('mangled') || candidate.traits.includes('deaf') || candidate.traits.includes('blind') || candidate.traits.includes('mute') || candidate.traits.includes('stutter')) {
+                generatedCharacterId = undefined;
+            }
         }
         const generatedCharacterWithBonuses = E.addBonusesToCandidate(characterId, generatedCharacterId);
         return generatedCharacterWithBonuses;
